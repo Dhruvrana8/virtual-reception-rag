@@ -65,26 +65,20 @@ class RAGPipeline:
 
         print(f"--- Loading LLM model: {self.gen_model_name} ---")
 
-        # 1️⃣ Load tokenizer
+        # Load tokenizer
         tokenizer = AutoTokenizer.from_pretrained(
             self.gen_model_name, trust_remote_code=True
         )
 
-        # 2️⃣ Load model on CPU first (required for disk offload)
+        # Load model on CPU first (required for disk offload)
         model = AutoModelForCausalLM.from_pretrained(
             self.gen_model_name,
-            dtype="auto",  # Changed from torch_dtype=torch.float32 to dtype="auto"
+            dtype="auto",
             trust_remote_code=True,
             device_map="auto",
         )
 
-        # 3️⃣ Removed Disk offload: `device_map="auto"` handles optimal device placement.
-        # The previous code for disk offload was:
-        # offload_dir = "./offload"
-        # Path(offload_dir).mkdir(exist_ok=True)
-        # model.disk_offload(offload_dir)
-
-        # 4️⃣ Create generation pipeline
+        # Create generation pipeline
         pipe = pipeline(
             "text-generation",
             model=model,
